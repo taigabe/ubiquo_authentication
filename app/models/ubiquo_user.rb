@@ -35,15 +35,22 @@ class UbiquoUser < ActiveRecord::Base
   attr_accessible :login, :email, :password, :password_confirmation, :is_admin, :is_active, :role_ids, :photo, :name, :surname, :locale
 
   named_scope :admin, lambda {|value|{
-              :conditions => {:is_admin => value.to_bool}
+    :conditions => {:is_admin => value.to_bool}
   }}
 
   named_scope :active, lambda {|value|{
-              :conditions => {:is_active => value.to_bool}
+    :conditions => {:is_active => value.to_bool}
   }}
 
+  named_scope :role, lambda {|role_id|
+    {
+      :joins      => :ubiquo_user_roles,
+      :conditions => { 'ubiquo_user_roles.role_id' => role_id }
+    }
+  }
+
   filtered_search_scopes :text => [:name, :surname, :login],
-                         :enable => [:admin, :active]
+                         :enable => [:admin, :active, :role]
 
   # Magic finder. It's like find_by_id_or_login
   def self.gfind(something, options={})
@@ -81,7 +88,7 @@ class UbiquoUser < ActiveRecord::Base
       user
     end
   end
-  
+
   # Authenticates a ubiquo_user by their login name and unencrypted password.  Returns the ubiquo_user or nil.
   def self.authenticate(login, password)
     u = find_by_login(login) # need to get the salt
@@ -128,7 +135,7 @@ class UbiquoUser < ActiveRecord::Base
     self.remember_token            = nil
     save(false)
   end
-  
+
   def reset_password!
     (password = ActiveSupport::SecureRandom.base64(6)).tap do
       self.password = password
@@ -166,7 +173,7 @@ class UbiquoUser < ActiveRecord::Base
     end
     false
   end
-  
+
   #gives the full name of the user, with name and surname.
   def full_name
     "#{self.surname}, #{self.name}"

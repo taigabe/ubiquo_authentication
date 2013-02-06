@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + "/../test_helper.rb"
 
 class UbiquoUserTest < ActiveSupport::TestCase
   use_ubiquo_fixtures
-  
+
   # fixtures :ubiquo_users
   def test_should_create_ubiquo_user
     assert_difference 'UbiquoUser.count' do
@@ -33,7 +33,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
       assert_nil UbiquoUser.create_first('mylogin','mypassword')
     end
   end
-  
+
   def test_should_require_name
     assert_no_difference 'UbiquoUser.count' do
       u = create_ubiquo_user(:name => nil)
@@ -54,7 +54,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
       assert u.errors.on(:login)
     end
   end
-  
+
   def test_should_require_email
     assert_no_difference 'UbiquoUser.count' do
       u = create_ubiquo_user(:email => nil)
@@ -66,7 +66,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
       email = "unique.mail@mail.com"
       u = create_ubiquo_user(:email => email)
       assert !u.new_record?
-      
+
       u = create_ubiquo_user(:email => email)
       assert u.errors.on(:email)
 
@@ -74,7 +74,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
       assert u.errors.on(:email)
     end
   end
-  
+
   def test_should_require_valid_email
     valid_mails = ["quire@quire.com", "qui.re@qui.re.com", "quire#spam@quire.com" ]
     not_valid_mails = ["qui re@quire.com", "quire quire.com", "quire.com", "quire@quire@quire.com", "quire@quire"]
@@ -180,7 +180,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
     u=ubiquo_users(:eduard)
     r=roles(:role_1)
     p=permissions(:permission_1)
-    
+
     r.add_permission(p)
 
     assert !u.has_permission?(p)
@@ -195,7 +195,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
     u=ubiquo_users(:josep)
     r=roles(:role_1)
     p=permissions(:permission_1)
-    
+
     r.add_permission(p)
     u.add_role(r)
 
@@ -217,19 +217,19 @@ class UbiquoUserTest < ActiveSupport::TestCase
     admin_ubiquo_users = [ubiquo_users(:admin)]
     non_admin_ubiquo_users = [ubiquo_users(:josep), ubiquo_users(:inactive), ubiquo_users(:eduard)]
     assert UbiquoUser.filtered_search({"filter_admin" => "true"}).to_set == admin_ubiquo_users.to_set
-    assert UbiquoUser.filtered_search({"filter_admin" => "false"}).to_set == non_admin_ubiquo_users.to_set      
+    assert UbiquoUser.filtered_search({"filter_admin" => "false"}).to_set == non_admin_ubiquo_users.to_set
   end
-  
+
   def test_should_filter_by_active
     active_ubiquo_users = [ubiquo_users(:admin)]
     non_active_ubiquo_users = [ubiquo_users(:josep), ubiquo_users(:inactive), ubiquo_users(:eduard)]
     active_ubiquo_users.each{|u| u.update_attribute :is_active, true}
     non_active_ubiquo_users.each{|u| u.update_attribute :is_active, false}
-    
+
     assert UbiquoUser.filtered_search({"filter_active" => "true"}).to_set == active_ubiquo_users.to_set
-    assert UbiquoUser.filtered_search({"filter_active" => "false"}).to_set == non_active_ubiquo_users.to_set      
+    assert UbiquoUser.filtered_search({"filter_active" => "false"}).to_set == non_active_ubiquo_users.to_set
   end
-  
+
   def test_should_filter_by_name
     users = [
       create_ubiquo_user(:login => 'log1', :email => '1@prova.com', :name => "find me"),
@@ -238,7 +238,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
     ]
     assert_equal_set users[0..1], UbiquoUser.filtered_search({"filter_text" => "find"})
   end
-  
+
   def test_should_filter_by_surname
     users = [
       create_ubiquo_user(:login => 'log1', :email => '1@prova.com', :surname => "find me"),
@@ -247,7 +247,7 @@ class UbiquoUserTest < ActiveSupport::TestCase
     ]
     assert_equal_set users[0..1], UbiquoUser.filtered_search({"filter_text" => "find"})
   end
-  
+
   def test_should_filter_by_login
     users = [
       create_ubiquo_user(:login => 'findme',      :email => '1@prova.com'),
@@ -256,22 +256,31 @@ class UbiquoUserTest < ActiveSupport::TestCase
     ]
     assert_equal_set users[0..1], UbiquoUser.filtered_search({"filter_text" => "find"})
   end
-  
+
+  def test_should_filter_by_role
+    users = [
+      create_ubiquo_user(:login => 'findme',      :email => '1@prova.com', :role_ids => [roles(:role_1).id]),
+      create_ubiquo_user(:login => 'findmeagain', :email => '2@prova.com', :role_ids => [roles(:role_1).id]),
+      create_ubiquo_user(:login => 'hideme',      :email => '3@prova.com', :role_ids => [roles(:role_2).id])
+    ]
+    assert_equal_set users[0..1], UbiquoUser.filtered_search({"filter_role" => roles(:role_1).id})
+  end
+
   def test_should_generate_random_password
     password = ubiquo_users(:josep).reset_password!
     assert_equal ubiquo_users(:josep), UbiquoUser.authenticate('josep', password)
   end
-  
+
   protected
-  
+
   def create_ubiquo_user(options = {})
     UbiquoUser.create({
         :name => "name",
         :surname => "surname",
-        :login => 'quire', 
-        :email => "quire@quire.com", 
-        :password => 'quire', 
-        :password_confirmation => 'quire' 
+        :login => 'quire',
+        :email => "quire@quire.com",
+        :password => 'quire',
+        :password_confirmation => 'quire'
       }.merge(options))
   end
 

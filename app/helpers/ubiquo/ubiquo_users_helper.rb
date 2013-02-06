@@ -2,12 +2,13 @@ module Ubiquo::UbiquoUsersHelper
 
   def ubiquo_user_filters
     filters_for 'UbiquoUser' do |f|
-      f.text if Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_string_filter_enabled)
+      f.text if Ubiquo::Settings[:ubiquo_authentication][:ubiquo_users_string_filter_enabled]
       f.boolean(:admin, {
         :caption       => t('ubiquo.auth.user_type'),
         :caption_true  => t('ubiquo.auth.user_admin'),
         :caption_false => t('ubiquo.auth.user_non_admin'),
-      }) if Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_admin_filter_enabled)
+      }) if Ubiquo::Settings[:ubiquo_authentication][:ubiquo_users_admin_filter_enabled]
+      f.roles(:role, @roles) if Ubiquo::Settings[:ubiquo_authentication][:ubiquo_users_role_filter_enabled]
     end
   end
 
