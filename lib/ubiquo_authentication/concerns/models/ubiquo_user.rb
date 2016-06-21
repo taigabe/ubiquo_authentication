@@ -103,7 +103,7 @@ module UbiquoAuthentication::Concerns::Models::UbiquoUser
   end
 
   def remember_me
-    remember_me_for Ubiquo::Config.context(:ubiquo_authentication).get(:remember_time)
+    remember_me_for Ubiquo::Settings.context(:ubiquo_authentication).get(:remember_time)
   end
 
   def remember_me_for(time)

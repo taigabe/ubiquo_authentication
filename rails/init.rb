@@ -31,7 +31,7 @@ Ubiquo::Plugin.register(:ubiquo_authentication, directory, config) do |config|
 
   config.add :photo_storage, lambda {
     begin
-      Ubiquo::Config.context(:ubiquo_media).get(:media_storage)
+      Ubiquo::Settings.context(:ubiquo_media).get(:media_storage)
     rescue
       :filesystem
     end

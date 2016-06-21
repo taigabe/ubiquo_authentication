@@ -5,10 +5,10 @@ class UbiquoUsersNotifier < ActionMailer::Base
   def forgot_password(user, host)
     locale = user.locale.blank? ? Ubiquo.default_locale : user.locale
     subject I18n.t('ubiquo.auth.new_pass_generated', 
-      :app_title => Ubiquo::Config.get(:app_title), 
+      :app_title => Ubiquo::Settings.get(:app_title), 
       :locale => locale)
     recipients user.email
-    from Ubiquo::Config.get(:notifier_email_from)
+    from Ubiquo::Settings.get(:notifier_email_from)
     body :user => user, :host => host
   end
   
@@ -17,10 +17,10 @@ class UbiquoUsersNotifier < ActionMailer::Base
   def confirm_creation(user, welcome_message, host)
     locale = user.locale.blank? ? Ubiquo.default_locale : user.locale
     subject I18n.t('ubiquo.auth.new_user_created', 
-      :app_title => Ubiquo::Config.get(:app_title), 
+      :app_title => Ubiquo::Settings.get(:app_title), 
       :locale => locale)
     recipients user.email
-    from Ubiquo::Config.get(:notifier_email_from)
+    from Ubiquo::Settings.get(:notifier_email_from)
     
     body :user => user, :host => host, :welcome_message => welcome_message, :locale => locale
   end

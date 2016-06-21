@@ -16,7 +16,7 @@ class UbiquoUsersNotifierTest < ActionMailer::TestCase
     assert_equal [ubiquo_user.email], email.to
     assert_match ubiquo_user.password , email.body
     assert_match /#{ubiquo_user.login}/ , email.body
-    assert_match /#{Ubiquo::Config.get(:app_title)}/ , email.subject
+    assert_match /#{Ubiquo::Settings.get(:app_title)}/ , email.subject
   end
   
   def test_should_send_confirm_creation
@@ -30,7 +30,7 @@ class UbiquoUsersNotifierTest < ActionMailer::TestCase
     assert_equal [ubiquo_user.email], email.to
     assert_match ubiquo_user.password , email.body
     assert_match /#{ubiquo_user.login}/ , email.body
-    assert_match /#{Ubiquo::Config.get(:app_title)}/ , email.subject
+    assert_match /#{Ubiquo::Settings.get(:app_title)}/ , email.subject
     assert_match /Welcome message/ , email.body
   end
     
