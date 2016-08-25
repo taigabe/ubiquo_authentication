@@ -6,11 +6,11 @@ Ubiquo::Plugin.register(:ubiquo_authentication, directory, config) do |config|
   config.add :remember_time, 2.weeks
   
   #The permission related with user management
-  config.add :user_navigator_permission, lambda{
+  config.add :user_navigator_permission, lambda{ |_|
     permit?("ubiquo_user_management")
   } 
   #The access control line related with user management
-  config.add :user_access_control, lambda{
+  config.add :user_access_control, lambda{ |_|
     access_control :DEFAULT => "ubiquo_user_management"
   }
   
@@ -29,7 +29,7 @@ Ubiquo::Plugin.register(:ubiquo_authentication, directory, config) do |config|
   #Configuration for modify sort order for ubiquo users list
   config.add :ubiquo_users_default_sort_order, 'DESC'
 
-  config.add :photo_storage, lambda {
+  config.add :photo_storage, lambda { |_|
     begin
       Ubiquo::Settings.context(:ubiquo_media).get(:media_storage)
     rescue
