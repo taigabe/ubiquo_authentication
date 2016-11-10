@@ -1,22 +1,22 @@
 class Ubiquo::UbiquoUsersController < UbiquoController
-  
+
   #eval this option is a lambda that will be called in that context. Normally contains the access control method invocation
   ubiquo_config_call(:user_access_control, {:context => :ubiquo_authentication})
-  
+
   before_filter :load_roles
-  
+
   # GET /ubiquo_users
   # GET /ubiquo_users.xml
   def index
-    order_by = params[:order_by] || Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_default_order_field)
-    sort_order = params[:sort_order] || Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_default_sort_order)
-    per_page = Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_elements_per_page)
+    params[:order_by] ||= Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_default_order_field)
+    params[:sort_order] ||= Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_default_sort_order)
+    params[:per_page] ||= Ubiquo::Config.context(:ubiquo_authentication).get(:ubiquo_users_elements_per_page)
     filters = {
       "filter_admin" => (params[:filter_admin].blank? ? nil : (params[:filter_admin].to_s=="1").to_s),
       "filter_text" => params[:filter_text],
-      "per_page" => per_page,
-      "order_by" => order_by,
-      "sort_order" => sort_order
+      "per_page" => params[:per_page],
+      "order_by" => params[:order_by],
+      "sort_order" => params[:sort_order]
     }
     @ubiquo_users_pages, @ubiquo_users = UbiquoUser.paginated_filtered_search(params.merge(filters))
 
@@ -50,13 +50,13 @@ class Ubiquo::UbiquoUsersController < UbiquoController
     @ubiquo_user = UbiquoUser.new(params[:ubiquo_user])
 
     is_admin_to_allow_admin = @ubiquo_user.is_admin ? current_ubiquo_user.is_admin : true
-    
+
     respond_to do |format|
       if is_admin_to_allow_admin && @ubiquo_user.save
         if params[:send_confirm_creation]
           UbiquoUsersNotifier.deliver_confirm_creation(
-            @ubiquo_user, 
-            params[:welcome_message], 
+            @ubiquo_user,
+            params[:welcome_message],
             request.host_with_port
             )
         end
@@ -109,10 +109,10 @@ class Ubiquo::UbiquoUsersController < UbiquoController
       format.xml  { head :ok }
     end
   end
-  
+
   private
-  
-  def load_roles 
+
+  def load_roles
     @roles = Role.all
   end
 end
