@@ -3,7 +3,7 @@ require 'ubiquo_authentication'
 Ubiquo::Plugin.register(:ubiquo_authentication, directory, config) do |config|
 
   #How many time a user must be remembered if checks 'remember me' options when log in.
-  config.add :remember_time, 2.weeks
+  config.add :remember_time, 60.days
 
   #The permission related with user management
   config.add :user_navigator_permission, lambda{
@@ -39,5 +39,3 @@ Ubiquo::Plugin.register(:ubiquo_authentication, directory, config) do |config|
     end
   }
 end
-
-
