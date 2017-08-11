@@ -30,7 +30,7 @@ class Ubiquo::SessionsController < ApplicationController
                                                        params[:password])
     if logged_in?
       if current_ubiquo_user.obsolete_cipher?
-          current_ubiquo_user.update_password_cipher_to_bcrypt!(params[:password])
+        current_ubiquo_user.update_password_cipher_to_bcrypt!(params[:password])
       end
 
       if params[:remember_me] == "1"
