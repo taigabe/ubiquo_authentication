@@ -1,5 +1,8 @@
 require 'digest/sha1'
+require 'bcrypt'
+
 class UbiquoUser < ActiveRecord::Base
+  include ::BcryptPassword
 
   has_many :ubiquo_user_roles
   has_many :roles, :through => :ubiquo_user_roles
@@ -95,20 +98,6 @@ class UbiquoUser < ActiveRecord::Base
     (u && (u.authenticated?(password) ? u : nil) && (u.is_active? ? u : nil))
   end
 
-  # Encrypts some data with the salt.
-  def self.encrypt(password, salt)
-    Digest::SHA1.hexdigest("--#{salt}--#{password}--")
-  end
-
-  # Encrypts the password with the ubiquo_user salt
-  def encrypt(password)
-    self.class.encrypt(password, salt)
-  end
-
-  def authenticated?(password)
-    crypted_password == encrypt(password)
-  end
-
   def remember_token?
     remember_token_expires_at && Time.now.utc < remember_token_expires_at
   end
@@ -125,7 +114,7 @@ class UbiquoUser < ActiveRecord::Base
   # The current ubiquo_user will not expire until 'time' is reached
   def remember_me_until(time)
     self.remember_token_expires_at = time
-    self.remember_token            = encrypt("--#{remember_token_expires_at}--")
+    self.remember_token            = sha1_encrypt("--#{remember_token_expires_at}--")
     save(false)
   end
 
@@ -179,13 +168,13 @@ class UbiquoUser < ActiveRecord::Base
     "#{self.surname}, #{self.name}"
   end
 
-
   protected
   # before filter
   def encrypt_password
     return if password.blank?
-    self.salt = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{login}--") if new_record?
-    self.crypted_password = encrypt(password)
+
+    assign_password_cipher_bcrypt if obsolete_cipher?
+    assign_encrypted_password(password)
   end
 
   def password_required?

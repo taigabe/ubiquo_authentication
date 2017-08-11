@@ -29,6 +29,10 @@ class Ubiquo::SessionsController < ApplicationController
     self.current_ubiquo_user = UbiquoUser.authenticate(params[:login],
                                                        params[:password])
     if logged_in?
+      if current_ubiquo_user.obsolete_cipher?
+          current_ubiquo_user.update_password_cipher_to_bcrypt!(params[:password])
+      end
+
       if params[:remember_me] == "1"
         self.current_ubiquo_user.remember_me
         cookies[:auth_token] = {
