@@ -2,7 +2,7 @@ require 'digest/sha1'
 require 'bcrypt'
 
 class UbiquoUser < ActiveRecord::Base
-  include ::BcryptPassword
+  include ::UserBcryptPassword
 
   has_many :ubiquo_user_roles
   has_many :roles, :through => :ubiquo_user_roles
