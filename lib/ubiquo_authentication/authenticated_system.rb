@@ -104,7 +104,7 @@ module UbiquoAuthentication
         return self.current_ubiquo_user = UbiquoUser.find_by_id(session['ubiquo'][:ubiquo_user_id])
       end
       if session[:ubiquo] && session[:ubiquo][:ubiquo_user_id]
-        return self.current_ubiquo_user = UbiquoUser.find_by_id(session[:ubiquo][:ubiquo_user_id])
+        self.current_ubiquo_user = UbiquoUser.find_by_id(session[:ubiquo][:ubiquo_user_id])
       end
     end
 
