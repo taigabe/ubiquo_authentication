@@ -1,6 +1,6 @@
 module UbiquoAuthentication
   module AuthenticatedSystem
-    
+
     # Returns true or false if the ubiquo_user is logged in.
     def logged_in?
       current_ubiquo_user != :false
@@ -15,11 +15,12 @@ module UbiquoAuthentication
 
     # Store the given ubiquo_user in the session.
     def current_ubiquo_user=(new_ubiquo_user)
-      session[:ubiquo] ||= {}
-      session[:ubiquo][:ubiquo_user_id] = (new_ubiquo_user.nil? || new_ubiquo_user.is_a?(Symbol)) ? nil : new_ubiquo_user.id
+      session_ubiquo = session['ubiquo'].present? ? session['ubiquo'] : session[:ubiquo]
+      session_ubiquo ||= {}
+      session_ubiquo[:ubiquo_user_id] = (new_ubiquo_user.nil? || new_ubiquo_user.is_a?(Symbol)) ? nil : new_ubiquo_user.id
       @current_ubiquo_user = new_ubiquo_user || :false
     end
-    
+
     # Filter method to enforce a login requirement.
     #
     # To require logins for all actions, use this in your controllers:
@@ -34,11 +35,11 @@ module UbiquoAuthentication
     #
     #   skip_before_filter :login_required
     #
-    
+
     def login_required
       logged_in? || access_denied
     end
-    
+
     # Filter method to enforce a superadmin login requirement.
     #
     # To require superadmin login for all actions, use this in your controllers:
@@ -53,7 +54,6 @@ module UbiquoAuthentication
     #
     #   skip_before_filter :superadmin_required
     #
-    
     def superadmin_required
       (logged_in? && current_ubiquo_user.is_superadmin?) || access_denied
     end
@@ -100,7 +100,12 @@ module UbiquoAuthentication
 
     # Attempt to login by the ubiquo_user id stored in the session.
     def login_from_session
-      self.current_ubiquo_user = UbiquoUser.find_by_id(session[:ubiquo][:ubiquo_user_id]) if session[:ubiquo] && session[:ubiquo][:ubiquo_user_id]
+      if session['ubiquo'] && session['ubiquo'][:ubiquo_user_id]
+        return self.current_ubiquo_user = UbiquoUser.find_by_id(session['ubiquo'][:ubiquo_user_id])
+      end
+      if session[:ubiquo] && session[:ubiquo][:ubiquo_user_id]
+        return self.current_ubiquo_user = UbiquoUser.find_by_id(session[:ubiquo][:ubiquo_user_id])
+      end
     end
 
     # Attempt to login by an expiring token in the cookie.
